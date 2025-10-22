@@ -71,13 +71,13 @@
 # same as the other BB consoles
 
 # 16mb/64mb SB/Corona BB: 0xC80F
-.ifdef xell_C8B8
-   .set xell_offset, 0xC8B8
+.ifdef xell_C80F
+   .set xell_offset, 0xC80F
 .endif
 
 # Jasper/Trinity BB: 0xC8B8
-.ifdef xell_C80F
-   .set xell_offset, 0xC80F
+.ifdef xell_C8B8
+   .set xell_offset, 0xC8B8
 .endif
 
 0:
