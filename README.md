@@ -8,7 +8,7 @@ It would also be cool to be able to produce patches for JTAG and a pre-patched S
 
 ## Building xeBuild patches
 
-Run build.bat. This is WIP obviously, but eventually it's going to produce patches_glitch2m_xxx that you can drop in your Jrunner folder.
+Run `build.bat`. It will generate a folder containing patches you can drop in to your J-runner folder. Inside the output folder, the individual patch sections can also be seen.
 
 ## Credits
 
