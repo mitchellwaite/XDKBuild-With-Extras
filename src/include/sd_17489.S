@@ -65,10 +65,19 @@
 	MAKEPATCH 0X4f30
 
 # XeLL offset in NAND is different for each console type
+# Corona is indeed the same offset as SB consoles. BB consoles (256/512)
+# are a bit screwy with the location of the patch sets and such
 
-# TODO is the corona offset even correct? In the official
-# patch set it's 0xC8B8 would have expected it to be the
-# same as the other BB consoles
+# The offsets might not make sense to you. You might think, how tf is XeLL
+# found at 0xC80F or 0xC8B8??? Well, fear not, this does actually make sense.
+# On the Xbox 360, NAND is mapped in to memory at 0x80000200C8000000. See that
+# C8? Well, that's the beginning of the NAND memory map. The 0F/B8 is the offset
+# from the beginning of the logical NAND data- XeLL on a 16MB image lives at
+# 0xF0000, in a BB image it lives at 0xB8000. The reason we can't just do a load
+# immediate into the register is because 64-bit load immediates aren't a thing-
+# all we get is the 16 bit li instruction so we get the rigamarole to load a 64-bit
+# value into the register to point to the memory mapped location where XeLL lives
+# Assembly is fun!
 
 # 16mb/64mb SB/Corona BB: 0xC80F
 .ifdef xell_C80F
@@ -76,8 +85,16 @@
 .endif
 
 # Jasper/Trinity BB: 0xC8B8
+# XeLL lives at logical addr 0xB8000
+
 .ifdef xell_C8B8
    .set xell_offset, 0xC8B8
+.endif
+
+# Armin's hacky devkit image
+.ifdef xell_hacky
+   .set xell_offset, 0xC80F
+   .set xell_offset_low, 0x4000
 .endif
 
 0:
@@ -156,6 +173,9 @@
 		oris	  %r5, %r5, 0x8000
 		sldi	  %r5, %r5, 32
 		oris	  %r5, %r5, xell_offset  # XeLL loaction in flash changes for full flash fs vs. 16mb
+.ifdef xell_hacky
+      ori     %r5, %r5, xell_offset_low
+.endif
 		mr	  %r5, %r5
 		lis	  %r6, -0x8000
 		sldi	  %r6, %r6, 32
