@@ -63,6 +63,29 @@
 # boot xell and patching engine plus pci inits
 #============================================================================	
 	MAKEPATCH 0X4f30
+
+# XeLL offset in NAND is different for each console type
+# 16mb/64mb small block: 0xC80F
+# Jasper BB: 0xC8B8
+# Trinity BB: TBD 0xC8B8
+# Corona BB: TBD 0xC8B8
+
+.ifdef consoletype_jasperbb
+   .set xell_offset, 0xC8B8
+.endif
+
+.ifdef consoletype_trinitybb
+   .set xell_offset, 0xC8B8
+.endif
+
+.ifdef consoletype_coronabb
+.set xell_offset, 0xC8B8
+.endif
+
+.ifdef consoletype_sb
+   .set xell_offset, 0xC80F
+.endif
+
 0:
 	loc_4E50:				
 		li	  %r5, 0x200
@@ -138,7 +161,7 @@
 		li	  %r5, 0x200
 		oris	  %r5, %r5, 0x8000
 		sldi	  %r5, %r5, 32
-		oris	  %r5, %r5, 0xC80f #xell loaction in flash 0xc8b8 for full flash fs
+		oris	  %r5, %r5, xell_offset  # XeLL loaction in flash changes for full flash fs vs. 16mb
 		mr	  %r5, %r5
 		lis	  %r6, -0x8000
 		sldi	  %r6, %r6, 32

@@ -206,7 +206,29 @@ MAKEPATCH 0x0000723C
 #   Utility Functions (c0z and ikari)
 #============================================================================
    MAKEPATCH  0x0000B188
-   .set nand_patch_offset, 0x00e0000 #vfuse address in flash cahnge for console type
+
+# Vfuses offset in NAND are different for each console type
+# 16mb/64mb small block: 0x00e0000
+# Jasper BB: 0x0100000
+# Trinity BB: TBD 0x0100000
+# Corona BB: TBD 0x0100000
+
+.ifdef consoletype_jasperbb
+   .set nand_patch_offset, 0x0100000
+.endif
+
+.ifdef consoletype_trinitybb
+   .set nand_patch_offset, 0x0100000
+.endif
+
+.ifdef consoletype_coronabb
+.set nand_patch_offset, 0x0100000
+.endif
+
+.ifdef consoletype_sb
+   .set nand_patch_offset, 0x00e0000
+.endif
+
    .set HvpGetFlashBaseAddress, 0x0000068C
    .set HvpFlashCopy, 0x00000484 # XeCryptCopyQwVec(void* dest, void* src, int iter)
    .set HvpMemCpy, 0x0000A4E0 #  memcpy(void *destination, const void *source, int len)
