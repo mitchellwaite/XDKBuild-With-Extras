@@ -222,7 +222,7 @@ MAKEPATCH 0x0000723C
 .endif
 
 .ifdef consoletype_coronabb
-.set nand_patch_offset, 0x0100000
+.set nand_patch_offset, 0x00e0000
 .endif
 
 .ifdef consoletype_sb
