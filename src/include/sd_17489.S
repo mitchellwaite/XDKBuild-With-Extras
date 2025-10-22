@@ -65,24 +65,18 @@
 	MAKEPATCH 0X4f30
 
 # XeLL offset in NAND is different for each console type
-# 16mb/64mb small block: 0xC80F
-# Jasper BB: 0xC8B8
-# Trinity BB: TBD 0xC8B8
-# Corona BB: TBD 0xC8B8
 
-.ifdef consoletype_jasperbb
+# TODO is the corona offset even correct? In the official
+# patch set it's 0xC8B8 would have expected it to be the
+# same as the other BB consoles
+
+# 16mb/64mb SB/Corona BB: 0xC80F
+.ifdef xell_C8B8
    .set xell_offset, 0xC8B8
 .endif
 
-.ifdef consoletype_trinitybb
-   .set xell_offset, 0xC8B8
-.endif
-
-.ifdef consoletype_coronabb
-.set xell_offset, 0xC8B8
-.endif
-
-.ifdef consoletype_sb
+# Jasper/Trinity BB: 0xC8B8
+.ifdef xell_C80F
    .set xell_offset, 0xC80F
 .endif
 

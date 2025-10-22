@@ -21,6 +21,9 @@ bin\xenon-as.exe src\khv_vfuses_trinitybb.S -I src\include -o output\khv_vfuses_
 bin\xenon-objcopy.exe output\khv_vfuses_trinitybb.elf -O binary output\khv_vfuses_trinitybb.bin
 del output\khv_vfuses_trinitybb.elf
 
+bin\xenon-as.exe src\khv_vfuses_coronabb.S -I src\include -o output\khv_vfuses_coronabb.elf
+bin\xenon-objcopy.exe output\khv_vfuses_coronabb.elf -O binary output\khv_vfuses_coronabb.bin
+del output\khv_vfuses_coronabb.elf
 
 echo Done!
 
@@ -31,9 +34,9 @@ bin\xenon-as.exe src\sd_vfuses_sb.S -I src\include -o output\sd_vfuses_sb.elf
 bin\xenon-objcopy.exe output\sd_vfuses_sb.elf -O binary output\sd_vfuses_sb.bin
 del output\sd_vfuses_sb.elf
 
-bin\xenon-as.exe src\sd_vfuses_jasperbb.S -I src\include -o output\sd_vfuses_jasperbb.elf
-bin\xenon-objcopy.exe output\sd_vfuses_jasperbb.elf -O binary output\sd_vfuses_jasperbb.bin
-del output\sd_vfuses_jasperbb.elf
+bin\xenon-as.exe src\sd_vfuses_bb.S -I src\include -o output\sd_vfuses_bb.elf
+bin\xenon-objcopy.exe output\sd_vfuses_bb.elf -O binary output\sd_vfuses_bb.bin
+del output\sd_vfuses_bb.elf
 
 echo Done!
 
@@ -57,9 +60,10 @@ copy output\patches_g2mjasper.bin output\patches_g2mtrinity.bin
 copy output\patches_g2mjasper.bin output\patches_g2mcorona.bin
 
 
-REM *** BB consoles all have different patch sets. C'est la vie
-copy /b output\sb_vfuses.bin + output\sd_vfuses_jasperbb.bin + output\khv_vfuses_jasperbb.bin output\patches_g2mjasper_flash.bin
-copy /b output\sb_vfuses.bin + output\sd_vfuses_jasperbb.bin + output\khv_vfuses_trinitybb.bin output\patches_g2mtrinity_flash.bin
+REM *** BB consoles all have different patch sets. C'est la vie.
+copy /b output\sb_vfuses.bin + output\sd_vfuses_bb.bin + output\khv_vfuses_jasperbb.bin output\patches_g2mjasper_flash.bin
+copy /b output\sb_vfuses.bin + output\sd_vfuses_bb.bin + output\khv_vfuses_trinitybb.bin output\patches_g2mtrinity_flash.bin
+copy /b output\sb_vfuses.bin + output\sd_vfuses_sb.bin + output\khv_vfuses_coronabb.bin output\patches_g2mcorona_flash.bin
 
 REM *** TODO sha256 checks in case something gets messed up???
 REM *** Then we can see what's what
