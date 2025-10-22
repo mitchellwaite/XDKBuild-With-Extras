@@ -17,6 +17,11 @@ bin\xenon-as.exe src\khv_vfuses_jasperbb.S -I src\include -o output\khv_vfuses_j
 bin\xenon-objcopy.exe output\khv_vfuses_jasperbb.elf -O binary output\khv_vfuses_jasperbb.bin
 del output\khv_vfuses_jasperbb.elf
 
+bin\xenon-as.exe src\khv_vfuses_trinitybb.S -I src\include -o output\khv_vfuses_trinitybb.elf
+bin\xenon-objcopy.exe output\khv_vfuses_trinitybb.elf -O binary output\khv_vfuses_trinitybb.bin
+del output\khv_vfuses_trinitybb.elf
+
+
 echo Done!
 
 echo.
@@ -43,17 +48,22 @@ echo Done!
 
 echo.
 echo Building XeBuild patches...
-copy /b output\sb_vfuses.bin + output\sd_vfuses_jasperbb.bin + output\khv_vfuses_jasperbb.bin output\patches_g2mjasper_flash.bin
-copy /b output\sb_vfuses.bin + output\sd_vfuses_sb.bin + output\khv_vfuses_hdd.bin output\patches_g2mjasper.bin
 
 REM *** For XDKBuild, literally all the patch sets are identical for falcon and later on 16mb consoles
 REM *** Zephyr and xenon patches *exist* but Jrunner uses the falcon console type for glich2m on them anyway
+copy /b output\sb_vfuses.bin + output\sd_vfuses_sb.bin + output\khv_vfuses_hdd.bin output\patches_g2mjasper.bin
 copy output\patches_g2mjasper.bin output\patches_g2mfalcon.bin
 copy output\patches_g2mjasper.bin output\patches_g2mtrinity.bin
 copy output\patches_g2mjasper.bin output\patches_g2mcorona.bin
 
-REM *** TODO need to figure out what the difference between jasper/trinity/corona bigffs images are
+
+REM *** BB consoles all have different patch sets. C'est la vie
+copy /b output\sb_vfuses.bin + output\sd_vfuses_jasperbb.bin + output\khv_vfuses_jasperbb.bin output\patches_g2mjasper_flash.bin
+copy /b output\sb_vfuses.bin + output\sd_vfuses_jasperbb.bin + output\khv_vfuses_trinitybb.bin output\patches_g2mtrinity_flash.bin
+
+REM *** TODO sha256 checks in case something gets messed up???
 REM *** Then we can see what's what
+
 echo Done!
 
 echo.
