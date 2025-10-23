@@ -208,10 +208,10 @@ MAKEPATCH 0x0000723C
    MAKEPATCH  0x0000B188
 
 # Vfuses offset in NAND are different for each console type
-# 16mb/64mb small block: 0x00e0000
-# Jasper BB: 0x0100000
-# Trinity BB: TBD 0x0100000
-# Corona BB: TBD 0x0100000
+# 16mb/64mb small block: 0xe0000
+# Jasper BB: 0x100000
+# Trinity BB: 0xF0000
+# Corona BB: 0xe0000
 
 .ifdef consoletype_jasperbb
    .set nand_patch_offset, 0x0100000
