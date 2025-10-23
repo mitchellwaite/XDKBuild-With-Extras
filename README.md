@@ -20,4 +20,4 @@ So far, only Glitch2m and DevGL on 16m/256m/512m/4g is supported (they both use 
 
 - [xvistaman2005/XDKbuild (original XDKbuild repository)](https://github.com/xvistaman2005/XDKbuild)
 - [Byrom90/Xbox_360_Research (17559 patch set)](https://github.com/Byrom90/Xbox_360_Research/blob/main/xeBuild_Patches/KHV_17559/17559_KHV_Patchset.s)
-- [GoobyCorp/Xbox-360-Crypto (patch decompiler)](https://github.com/GoobyCorp/Xbox-360-Crypto)  
+- [GoobyCorp/Xbox-360-Crypto (patch decompiler, BL patching code)](https://github.com/GoobyCorp/Xbox-360-Crypto)  
