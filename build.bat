@@ -41,6 +41,9 @@ bin\xenon-as.exe src\sd_vfuses_bb.S -I src\include -o output\patch_sections\sd_v
 bin\xenon-objcopy.exe output\patch_sections\sd_vfuses_bb.elf -O binary output\patch_sections\sd_vfuses_bb.bin
 del output\patch_sections\sd_vfuses_bb.elf
 
+bin\xenon-as.exe src\sd_vfuses_devkit.S -I src\include -o output\patch_sections\sd_vfuses_devkit.elf
+bin\xenon-objcopy.exe output\patch_sections\sd_vfuses_devkit.elf -O binary output\patch_sections\sd_vfuses_devkit.bin
+del output\patch_sections\sd_vfuses_devkit.elf
 echo Done!
 
 echo.
