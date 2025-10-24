@@ -71,6 +71,14 @@ copy /b output\patch_sections\sb_vfuses.bin + output\patch_sections\sd_vfuses_bb
 copy /b output\patch_sections\sb_vfuses.bin + output\patch_sections\sd_vfuses_bb.bin + output\patch_sections\khv_vfuses_trinitybb.bin output\patches_g2mtrinity_flash.bin
 copy /b output\patch_sections\sb_vfuses.bin + output\patch_sections\sd_vfuses_sb.bin + output\patch_sections\khv_vfuses_coronabb.bin output\patches_g2mcorona_flash.bin
 
+REM *** This is a bit hacky for a devkit image... need to figure out how we go about patching the SD properly
+REM *** Corona BB KHV patches are the same as SB minus the HDD redirection (i.e. fuses and patches are at 0xE0000)
+REM *** The "devkit" SD patch looks for XeLL at 0x1600000 because XeBuild can't be consistent in where the start
+REM *** of the filesystem in a small block image is. SB patches are ignored pretty much.. just here to make sure
+REM *** the sections in the patch file are correct and xeBuild doesn't freak out (plz open source xebuild)
+copy /b output\patch_sections\sb_vfuses.bin + output\patch_sections\sd_vfuses_devkit.bin + output\patch_sections\khv_vfuses_coronabb.bin output\patches_devkit.bin
+
+
 echo Done!
 
 echo.
@@ -83,6 +91,8 @@ echo.
 certutil -hashfile "output\patches_g2mtrinity_flash.bin" SHA256
 echo.
 certutil -hashfile "output\patches_g2mcorona_flash.bin" SHA256
+echo.
+certutil -hashfile "output\patches_devkit.bin" SHA256
 echo.
 
 echo.
