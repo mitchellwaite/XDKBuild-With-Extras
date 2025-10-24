@@ -193,25 +193,19 @@ load_xell:
    .set xell_offset, 0xC80F
    .endif
 
-# Jasper/Trinity BB: 0xB8000
+# Jasper/Trinity BB: 0xB80000
    .ifdef xell_C8B8
    .set xell_offset, 0xC8B8
-   .endif
-
-# Armin's hacky devkit image... when xeBuild does a 64mb devkit image,
-# it puts XeLL in the filesystem a whole 0x4000 later than usual. idk
-# why, but i'm going to see if we can just plop XeLL somewhere at the
-# end of flash so we don't need to add any extra instructions to the SD
-# Going to try 0x1600000, looks like there's free space
-
-   .ifdef xell_hacky
-   .set xell_offset, 0xC960
    .endif
 
    li      %r5, 0x200
    oris    %r5, %r5, 0x8000
    sldi    %r5, %r5, 32
+.ifdef xell_hacky
+   bl set_bits_for_xell_in_flashfs
+.else
    oris    %r5, %r5, xell_offset  # XeLL loaction in flash changes for full flash fs vs. 16mb
+.endif
    mr      %r5, %r5
    lis     %r6, -0x8000
    sldi    %r6, %r6, 32
@@ -397,6 +391,21 @@ loc_51B0:
    isync
    mtmsrd  %r7
    rfid
+
+# For armin's hacky 64mb XDKbuild image, xell in flashfs lives
+# a whole 0x4000 later in NAND. This makes us need an additional
+# instruction to set up the value in r5 we want to read from.
+# Branching here so we don't accidentally mess up the offsets
+# elsewhere in the patch set. TODO: can we put the oris/ori
+# in the original spot or will it bump everything too far?
+# In any case. XeLL lives at 0xF4000 in flash on a 64mb
+# devkit image because reasons. Need to handle that separately.
+.ifdef xell_hacky
+set_bits_for_xell_in_flashfs:
+   oris    %r5, %r5, 0xC80F
+   ori     %r5, %r5, 0x4000
+   blr
+.endif
 
 9:
 #============================================================================
