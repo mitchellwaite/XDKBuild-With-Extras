@@ -29,6 +29,7 @@ parser.add_argument("patch",help="The xeBuild patch file to patch the bootloader
 parser.add_argument("output",help="Where to write the patched bootloader")
 parser.add_argument("--noheaderupdate",action='store_true', help="Don't update anything in the BL header")
 parser.add_argument("--verbose",action='store_true')
+parser.add_argument("--extend", help="Extend the bootloader by adding free space")
 args = parser.parse_args()
 
 
@@ -40,6 +41,11 @@ print("Length of unpatched BL: " + hex(len(sd_data)))
 sd_data = apply_patches(sd_data, sd_patch_data)
 
 print("Length of patched BL: " + hex(len(sd_data)))
+
+if args.extend is not None:
+   sizeToExtend = int(args.extend, 16)
+   print("Extending BL to size " + hex(sizeToExtend))
+   sd_data.extend(b'\x00' * (sizeToExtend - len(sd_data)))
 
 if(False == args.noheaderupdate):
    print("Patching length into BL at offset 0xC")
