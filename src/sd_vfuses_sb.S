@@ -1,4 +1,4 @@
-# Builds SD patches with VFuse support for small block consoles (and corona???) with XeLL located at 0xC80F
+# Builds SD patches with VFuse support for small block consoles (and corona) with patches located at 0xE0000 XeLL located at 0xF0000
 
 .set vfuses, 1
 .set xell_C80F, 1

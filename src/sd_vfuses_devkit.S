@@ -1,6 +1,6 @@
-# Builds SD patches with VFuse support for small block consoles (and corona???) with XeLL located at 0x1600000
+# Builds SD patches with VFuse support for 64mb small block consoles with patches at 0xE4000 and XeLL located at 0xF4000
 
 .set vfuses, 1
-.set xell_hacky, 1
+.set devgl64, 1
 
 .include "sd_17489.S"

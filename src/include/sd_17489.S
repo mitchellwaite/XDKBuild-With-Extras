@@ -201,7 +201,7 @@ load_xell:
    li      %r5, 0x200
    oris    %r5, %r5, 0x8000
    sldi    %r5, %r5, 32
-.ifdef xell_hacky
+.ifdef devgl64
    bl set_bits_for_xell_in_flashfs
 .else
    oris    %r5, %r5, xell_offset  # XeLL loaction in flash changes for full flash fs vs. 16mb
@@ -400,7 +400,7 @@ loc_51B0:
 # in the original spot or will it bump everything too far?
 # In any case. XeLL lives at 0xF4000 in flash on a 64mb
 # devkit image because reasons. Need to handle that separately.
-.ifdef xell_hacky
+.ifdef devgl64
 set_bits_for_xell_in_flashfs:
    oris    %r5, %r5, 0xC80F
    ori     %r5, %r5, 0x4000

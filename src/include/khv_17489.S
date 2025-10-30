@@ -85,12 +85,6 @@ MAKEPATCH 0x0000723C
    li %r3, 1
 9: 
 
-
-
-
-
-
-
 # VFuse patches for 17489/21256.18
 
 
@@ -208,7 +202,8 @@ MAKEPATCH 0x0000723C
    MAKEPATCH  0x0000B188
 
 # Vfuses offset in NAND are different for each console type
-# 16mb/64mb small block: 0xe0000
+# 16mb small block: 0xe0000
+# 64mb small block: 0xe4000
 # Jasper BB: 0x100000
 # Trinity BB: 0xF0000
 # Corona BB: 0xe0000
@@ -227,6 +222,10 @@ MAKEPATCH 0x0000723C
 
 .ifdef consoletype_sb
    .set nand_patch_offset, 0x00e0000
+.endif
+
+.ifdef consoletype_devgl64
+   .set nand_patch_offset, 0x00e4000
 .endif
 
    .set HvpGetFlashBaseAddress, 0x0000068C
