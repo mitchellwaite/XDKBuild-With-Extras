@@ -57,6 +57,10 @@ bin\xenon-as.exe src\sb_vfuses.S -I src\include -o output\patch_sections\sb_vfus
 bin\xenon-objcopy.exe output\patch_sections\sb_vfuses.elf -O binary output\patch_sections\sb_vfuses.bin
 del output\patch_sections\sb_vfuses.elf
 
+bin\xenon-as.exe src\sb_shadowboot.S -I src\include -o output\patch_sections\sb_shadowboot.elf
+bin\xenon-objcopy.exe output\patch_sections\sb_shadowboot.elf -O binary output\patch_sections\sb_shadowboot.bin
+del output\patch_sections\sb_shadowboot.elf
+
 echo Done!
 
 echo.

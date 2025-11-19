@@ -45,14 +45,25 @@
 .endif
 
 #============================================================================
-# patch out the fuse row 2 check post 0x9b why? vfuses dont fix ?
+# patch out the fuse row 2 check post 0x9C why? vfuses dont fix ?
 #============================================================================
 	  	MAKEPATCH 0x1398
 0:
 	b 0x14
 9:
 
-.ifdef sboot
+.ifdef shadowboot
+#============================================================================
+# skip the entirety of the fusecheck routine at 0x1280
+# TODO this probably means we can delete the other fuse row checks yeah? 
+#============================================================================
+MAKEPATCH 0x508
+0:
+   nop
+9:
+.endif
+
+.ifdef shadowboot
 #============================================================================
 # patch out the fuse row 4 check post 0x9e 
 #============================================================================
@@ -62,7 +73,7 @@
 9:
 .endif
 
-.ifdef sboot
+.ifdef shadowboot
 #============================================================================
 # patch out the fuse row 5 check post 0x9f 
 #============================================================================
@@ -72,9 +83,9 @@
 9:
 .endif
 
-.ifdef sboot
+.ifdef shadowboot
 #============================================================================
-# patch out the fuse row 6 check post 0x9f 
+# patch out the fuse row 6 check post 0xA0
 #============================================================================
 	  	MAKEPATCH 0x14c8
 0:
