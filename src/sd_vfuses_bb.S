@@ -2,5 +2,6 @@
 
 .set vfuses, 1
 .set xell_C8B8, 1
+.set patchengine, 1
 
 .include "sd_17489.S"

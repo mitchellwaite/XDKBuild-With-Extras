@@ -2,5 +2,6 @@
 
 .set vfuses, 1
 .set devgl64, 1
+.set patchengine, 1
 
 .include "sd_17489.S"

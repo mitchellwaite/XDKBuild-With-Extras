@@ -12,54 +12,28 @@ mkdir output\patch_sections
 
 echo Building kernel patch files...
 
-bin\xenon-as.exe src\khv_vfuses_sb.S -I src\include -o output\patch_sections\khv_vfuses_sb.elf
-bin\xenon-objcopy.exe output\patch_sections\khv_vfuses_sb.elf -O binary output\patch_sections\khv_vfuses_sb.bin
-del output\patch_sections\khv_vfuses_sb.elf
-
-bin\xenon-as.exe src\khv_vfuses_jasperbb.S -I src\include -o output\patch_sections\khv_vfuses_jasperbb.elf
-bin\xenon-objcopy.exe output\patch_sections\khv_vfuses_jasperbb.elf -O binary output\patch_sections\khv_vfuses_jasperbb.bin
-del output\patch_sections\khv_vfuses_jasperbb.elf
-
-bin\xenon-as.exe src\khv_vfuses_trinitybb.S -I src\include -o output\patch_sections\khv_vfuses_trinitybb.elf
-bin\xenon-objcopy.exe output\patch_sections\khv_vfuses_trinitybb.elf -O binary output\patch_sections\khv_vfuses_trinitybb.bin
-del output\patch_sections\khv_vfuses_trinitybb.elf
-
-bin\xenon-as.exe src\khv_vfuses_coronabb.S -I src\include -o output\patch_sections\khv_vfuses_coronabb.elf
-bin\xenon-objcopy.exe output\patch_sections\khv_vfuses_coronabb.elf -O binary output\patch_sections\khv_vfuses_coronabb.bin
-del output\patch_sections\khv_vfuses_coronabb.elf
-
-bin\xenon-as.exe src\khv_vfuses_devkit.S -I src\include -o output\patch_sections\khv_vfuses_devkit.elf
-bin\xenon-objcopy.exe output\patch_sections\khv_vfuses_devkit.elf -O binary output\patch_sections\khv_vfuses_devkit.bin
-del output\patch_sections\khv_vfuses_devkit.elf
+call:buildPatchSection khv_vfuses_sb
+call:buildPatchSection khv_vfuses_jasperbb
+call:buildPatchSection khv_vfuses_trinitybb
+call:buildPatchSection khv_vfuses_coronabb
+call:buildPatchSection khv_vfuses_devkit
 
 echo Done!
 
 echo.
 echo Building SD patch files...
 
-bin\xenon-as.exe src\sd_vfuses_sb.S -I src\include -o output\patch_sections\sd_vfuses_sb.elf
-bin\xenon-objcopy.exe output\patch_sections\sd_vfuses_sb.elf -O binary output\patch_sections\sd_vfuses_sb.bin
-del output\patch_sections\sd_vfuses_sb.elf
+call:buildPatchSection sd_vfuses_bb
+call:buildPatchSection sd_vfuses_sb
+call:buildPatchSection sd_vfuses_devkit
+call:buildPatchSection sd_shadowboot
 
-bin\xenon-as.exe src\sd_vfuses_bb.S -I src\include -o output\patch_sections\sd_vfuses_bb.elf
-bin\xenon-objcopy.exe output\patch_sections\sd_vfuses_bb.elf -O binary output\patch_sections\sd_vfuses_bb.bin
-del output\patch_sections\sd_vfuses_bb.elf
-
-bin\xenon-as.exe src\sd_vfuses_devkit.S -I src\include -o output\patch_sections\sd_vfuses_devkit.elf
-bin\xenon-objcopy.exe output\patch_sections\sd_vfuses_devkit.elf -O binary output\patch_sections\sd_vfuses_devkit.bin
-del output\patch_sections\sd_vfuses_devkit.elf
 echo Done!
 
 echo.
 
-echo Building SB patch file...
-bin\xenon-as.exe src\sb_vfuses.S -I src\include -o output\patch_sections\sb_vfuses.elf
-bin\xenon-objcopy.exe output\patch_sections\sb_vfuses.elf -O binary output\patch_sections\sb_vfuses.bin
-del output\patch_sections\sb_vfuses.elf
-
-bin\xenon-as.exe src\sb_shadowboot.S -I src\include -o output\patch_sections\sb_shadowboot.elf
-bin\xenon-objcopy.exe output\patch_sections\sb_shadowboot.elf -O binary output\patch_sections\sb_shadowboot.bin
-del output\patch_sections\sb_shadowboot.elf
+call:buildPatchSection sb_vfuses
+call:buildPatchSection sb_shadowboot
 
 echo Done!
 
@@ -107,3 +81,10 @@ echo.
 echo All Done!
 
 pause
+goto:eof
+
+:buildPatchSection
+bin\xenon-as.exe src\%~1.S -I src\include -o output\patch_sections\%~1.elf
+bin\xenon-objcopy.exe output\patch_sections\%~1.elf -O binary output\patch_sections\%~1.bin
+del output\patch_sections\%~1.elf
+goto:eof
