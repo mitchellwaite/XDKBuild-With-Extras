@@ -7,7 +7,8 @@ _start:
 
 .ifdef patchengine
 #============================================================================
-# branch to smc xell eject check
+# Branch to CDXell... this replaces the first instruction at the entrypoint
+# of the SD with a function call
 #============================================================================   
 MAKEPATCH 0X310 
 0:
@@ -15,7 +16,8 @@ MAKEPATCH 0X310
 9:
 
 #============================================================================
-# branch to patch engine apply khv patches
+# Rather than calling the rfid instruction to launch the kernel, branch to
+# the patch engine to apply 
 #============================================================================
 MAKEPATCH 0X6b4  
 0:
@@ -23,8 +25,8 @@ MAKEPATCH 0X6b4
 9:
 
 #============================================================================
-# TODO: figure out what this patch does. The XDKbuild shadowboot doesn't
-# have it
+# Replace the function call to 0xA58, effectively making it always return 0
+# TODO: figure out what this function does... shadowboot doesn't patch this
 #============================================================================
 MAKEPATCH 0Xd28
 0:
@@ -32,8 +34,8 @@ MAKEPATCH 0Xd28
 9:
 
 #============================================================================
-# TODO: figure out what this patch does. The XDKbuild shadowboot doesn't
-# have it
+# NOP out a panic/jump to invalid instruction
+# TODO: figure out what we're patching since the shadowboot doesn't need it
 #============================================================================
 MAKEPATCH 0Xd7c 
 0:
