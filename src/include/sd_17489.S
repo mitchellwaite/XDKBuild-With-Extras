@@ -72,60 +72,61 @@ MAKEPATCH 0XA80
 .ifdef patchengine
 #============================================================================
 # PCI init, SMC handshake, patching engine, Boot XeLL
-# This is effectively what cdxell does
+# This section of the patch is based on CDXell
 #============================================================================   
 MAKEPATCH 0X4f30
 0:
-
-pci_init:         
+   # This section of the patch appears to skip UART 
+   # init if NAND at 0x4D is set to 0   
    li      %r5, 0x200
    oris    %r5, %r5, 0x8000
    sldi    %r5, %r5, 32
-   oris    %r5, %r5, 0xC800
+   oris    %r5, %r5, 0xC800  # r5 pointing to memory mapped NAND: 0x80000200 0xC8000000
    lbz     %r4, 0x4D(%r5)
    isync
    cmplwi  %r4, 0
-   beq     smc_init
+   beq     smc_init 
 
-   lis     %r3, -0x51FF
+# Enable UART
+   lis     %r3, -0x51FF # 0xAE010000 -> set UART to 38400, 8, N, 1 (CYGNOS compatible??? this is what XeLL sets the reg to in cygnos mode)
    lis     %r4, -0x8000 
    ori     %r4, %r4, 0x200   
    sldi    %r4, %r4, 32
-   oris    %r4, %r4, 0xEA00
-   stw     %r3, 0x101C(%r4)
+   oris    %r4, %r4, 0xEA00 # 0x80000200 0xEA00101C is the UART config register
+   stw     %r3, 0x101C(%r4) 
 
 # SMC handshake
 smc_init:            
    mflr    %r12
-   bl      sub_50F0
+   bl      print_dot_uart
    mtlr    %r12
    li      %r8, 0x200
    oris    %r8, %r8, 0x8000
    sldi    %r8, %r8, 32
-   oris    %r8, %r8, 0xEA00
+   oris    %r8, %r8, 0xEA00 # R8 -> SMC FIFO base address 
    lis     %r9, 0x400
-   lis     %r10, 0x100
+   lis     %r10, 0x100 # SMC command 0x1 is GetPowerUpCause
    li      %r11, 0
-   stw     %r9, 0x1084(%r8)
-   stw     %r10, 0x1080(%r8)
-   stw     %r11, 0x1080(%r8)
-   stw     %r11, 0x1080(%r8)
-   stw     %r11, 0x1080(%r8)
-   stw     %r11, 0x1084(%r8)
+   stw     %r9, 0x1084(%r8)   # start message
+   stw     %r10, 0x1080(%r8)  # command 0x1 (GetPowerUpCause)
+   stw     %r11, 0x1080(%r8)  # rest of the SMC message is blank 0x0
+   stw     %r11, 0x1080(%r8)  #
+   stw     %r11, 0x1080(%r8)  #
+   stw     %r11, 0x1084(%r8)  # end message
 
 smc_handshake_loop:            
-   lwz     %r12, 0x1094(%r8)
+   lwz     %r12, 0x1094(%r8) # Wait for a message
    and.    %r12, %r12, %r9
    beq     smc_handshake_loop
-   stw     %r9, 0x1094(%r8)
-   lwz     %r12, 0x1090(%r8)
+   stw     %r9, 0x1094(%r8)  # Start to read reply
+   lwz     %r12, 0x1090(%r8) # First byte of the response is all we care about
+   lwz     %r3, 0x1090(%r8)  # the rest of the reply are zeros... put them in r3
    lwz     %r3, 0x1090(%r8)
    lwz     %r3, 0x1090(%r8)
-   lwz     %r3, 0x1090(%r8)
-   stw     %r11, 0x1094(%r8)
-   srwi    %r3, %r12, 24
+   stw     %r11, 0x1094(%r8) # end read reply
+   srwi    %r3, %r12, 24     # shift right so we get the first byte of the reply in R3 (which should be 0x1)
    cmpwi   %r3, 1
-   bne     smc_handshake_loop
+   bne     smc_handshake_loop # If we got a bad reply... try again
 
 # This is a list of valid powerup causes:
 #
@@ -160,24 +161,28 @@ smc_handshake_loop:
    beq     load_xell
 
 # Boot the kernel... no need to go further
+# The bl to the beginning of this function
+# replaces a lis instruction, so we'll do
+# what was replaced and then branch back
+# to where we left off
 start_kernel:            
    lis     %r3, 0x300
    blr
 
-load_xell:            
+load_xell:
    li      %r7, 0x200
    oris    %r7, %r7, 0x8000
    sldi    %r7, %r7, 32
    oris    %r7, %r7, 6
-   ori     %r7, %r7, 0x1010
+   ori     %r7, %r7, 0x1010 # r7 contains the base address for the POST bus  0x80000200_00061010
 
 # Set post code 0x10
    li      %r3, 0x10
    sldi    %r3, %r3, 56
    std     %r3, 0(%r7)
 
-# Not sure what this does tbh... will figure it out
-   bl      sub_4FCC
+# Initialize PCI devices before we jump to XeLL
+   bl      pci_init
 
 # Construct the address to XeLL in the memory mapped NAND space
 # XeLL offset in NAND is different for each console type
@@ -239,7 +244,7 @@ xell_copy_loop:
    addi    %r5, %r5, 4
    bdnz    xell_copy_loop
 
-# Set POST code 0x12
+# Set POST code 0x12 (XeLL is done loading)
    li      %r3, 0x12
    sldi    %r3, %r3, 56
    std     %r3, 0(%r7)
@@ -252,20 +257,20 @@ xell_copy_loop:
    mtsrr0  %r9
    rfid
 
-sub_4FCC:            
+pci_init:            
    lis     %r3, -0x8000
    ori     %r3, %r3, 0x17c   
    sldi    %r3, %r3, 32
    oris    %r3, %r3, 0x400
-   ori     %r3, %r3, 0x50fC
+   ori     %r3, %r3, 0x50fC # Address of PCI_INIT_LIST. If code is added before the struct, this must be changed
    li      %r30, 0x200
    oris    %r30, %r30, 0x8000
    sldi    %r30, %r30, 32
 
-loc_4FEC:            
+pci_init_loop:            
    lwzu    %r4, 4(%r3)
    cmplwi  %r4, 0
-   beqlr
+   beqlr   # Return from the function when we hit the 0x00000000
    lwzu    %r31, 4(%r3)
    stwbrx  %r31, %r30, %r4
    li      %r31, 0xFF
@@ -275,9 +280,10 @@ loc_4FEC:
    lwzu    %r29, 4(%r3)
    or      %r31, %r31, %r29
    stwbrx  %r31, %r30, %r4
-   b       loc_4FEC
-# End of function sub_4FCC
+   b       pci_init_loop
+# End of function pci_init
 
+PCI_INIT_LIST:
    .long 0xD0000010
    .long 0xEA000000
    .long 0x00000156
@@ -331,21 +337,21 @@ loc_4FEC:
    .long 0x00000002
    .long 0x00000000
 
-sub_50F0:            
-   li      %r3, 0x2E 
+print_dot_uart:            
+   li      %r3, 0x2E       # ASCII 0x2E (.) 
    lis     %r4, -0x8000 
    ori     %r4, %r4, 0x200   
    sldi    %r4, %r4, 32
-   oris    %r4, %r4, 0xEA00
+   oris    %r4, %r4, 0xEA00 # SMC base address 0xEA000000
    slwi    %r3, %r3, 24
-   stw     %r3, 0x1014(%r4)
+   stw     %r3, 0x1014(%r4) # 0xEA001014 == UART data register
 
-loc_510C:            
-   lwz     %r3, 0x1018(%r4)
+wait_for_character_sent:            
+   lwz     %r3, 0x1018(%r4) # wait until the character we sent is actually sent
    rlwinm. %r3, %r3, 0,6,6
-   beq     loc_510C
+   beq     wait_for_character_sent
    blr
-# End of function sub_50F0
+# End of function print_dot_uart
 
 # TODO this looks like the patching engine
 loc_511C:            
@@ -353,21 +359,21 @@ loc_511C:
    li      %r8, 0x10
    andc    %r8, %r7, %r8
    mtmsrd  %r8
-   bl      sub_50F0
+   bl      print_dot_uart
    li      %r5, 0x200 
    oris    %r5, %r5, 0x8000
    sldi    %r5, %r5, 32
    oris    %r5, %r5, 0xC800 
    mr      %r5, %r5
-   lwz     %r6, 0x70(%r5)
-   lwz     %r4, 0x64(%r5)
-   cmplwi  %r6, 0
-   bne     loc_5158
-   lis     %r6, 1
+   lwz     %r6, 0x70(%r5) # Load the patch slot size from 0x70 in NAND
+   lwz     %r4, 0x64(%r5) # load the first patch slot address from 0x64 in NAND
+   cmplwi  %r6, 0         # Test if the patch slot size is 0 (xeBuild bug? even if not, the images don't boot when this is 0)
+   bne     patch_slot_size_nonzero
+   lis     %r6, 1         # Default patch slot size (doesn't work for me but whatever this is how the existing patches work)
 
-loc_5158:            
+patch_slot_size_nonzero:            
    add     %r4, %r4, %r6
-   addi    %r4, %r4, 0x5C #location of patches jasper bb 0x5c
+   addi    %r4, %r4, 0x5C # Skip past the virtual fuses (the first 0x60 bytes in the patch set)
    or      %r3, %r5, %r4
    isync
 
