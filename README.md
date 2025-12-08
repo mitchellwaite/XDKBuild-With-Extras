@@ -1,8 +1,10 @@
 # XDKBuild-With-Extras
 
-XDKBuild but with more patches. (Eventually)
+This is the RGLoader dev branch. Patches are based on the following:
 
-RGLoader is nice, but it's quite a bit more complex to set up. It's also nice to be able to boot the system without a hard drive installed on a 16mb system... xshell is "good enough" for a lot of things. I'd like to have a "set it and forget it" NAND image that just has "the" patch set and that's that.
+https://github.com/GoobyCorp/Xbox-360-Crypto/tree/master/Patches/RGL/17559-dev
+
+The gist of the patch set is that we're using XDKBuild SB/SD patches and adding the RGLoader kernel patches. The XDKBuild kernel patches for virtual fuses and the flag fixer remain. So far i've tested this on an RGH3 falcon and it works pretty perfectly.
 
 ## Building xeBuild patches
 
@@ -12,9 +14,8 @@ So far, only Glitch2m and DevGL on 16m/256m/512m/4g is supported (they both use 
 
 ## Potential future items
 
-- XDKBuild for 64mb XSB machines
 - XDKBuild for JTAG
-- FreeBoot Syscall 0 backdoor installed by default
+- FreeBoot Syscall 0 backdoor installed by default (non-RGLoader)
 
 ## Credits
 
