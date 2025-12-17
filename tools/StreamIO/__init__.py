@@ -1,1 +1,0 @@
-from .StreamIO import StreamIO, Endian, StreamSection, ShrinkMode, SEEK_SET, SEEK_CUR, SEEK_END
